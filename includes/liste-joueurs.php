@@ -1,8 +1,11 @@
 <?php
 
-add_shortcode('liste_joueurs', 'afficher_liste_joueurs');
+add_shortcode('liste_joueurs_1', 'afficher_liste_joueurs_1');
+require_once 'fonctions.php';
+//require_once './fonctions.php';
 
-function afficher_liste_joueurs()
+//fonction pour afficher les joueurs 
+function afficher_liste_joueurs_1()
 {
     // Définir le chemin du fichier JSON
     $file_path = plugin_dir_path(__FILE__) . 'joueur_form.json';
@@ -13,7 +16,7 @@ function afficher_liste_joueurs()
     }
 
     // Lire et décoder le fichier JSON
-    $joueurs = json_decode(file_get_contents($file_path), true);
+    $joueurs = obtenir_joueurs();
 
     if (!is_array($joueurs)) {
         return "<p>Erreur de lecture des joueurs.</p>";
@@ -54,16 +57,23 @@ function afficher_liste_joueurs()
         <tbody>";
 
     foreach ($joueurs_filtres as $index => $joueur) {
+        $nom = isset($joueur['pers_nom']) ? $joueur['pers_nom'] : 'N/A';
+        $prenom = isset($joueur['pers_prenom']) ? $joueur['pers_prenom'] : 'N/A';
+        $date_nai = isset($joueur['pers_date_nai']) ? $joueur['pers_date_nai'] : 'N/A';
+        $adresse = isset($joueur['pers_adresse']) ? $joueur['pers_adresse'] : 'N/A';
+        $npa = isset($joueur['pers_NPA']) ? $joueur['pers_NPA'] : 'N/A';
+        $equipe = isset($joueur['equ_cat']) ? $joueur['equ_cat'] : 'N/A';
+    
         $html .= "<tr>
-            <td>{$joueur['name']}</td>
-            <td>{$joueur['firstName']}</td>
-            <td>{$joueur['dateNaissance']}</td>
-            <td>{$joueur['address']}</td>
-            <td>{$joueur['npa']}</td>
-            <td>{$joueur['equipe']}</td>
+            <td>$nom</td>
+            <td>$prenom</td>
+            <td>$date_nai</td>
+            <td>$adresse</td>
+            <td>$npa</td>
+            <td>$equipe</td>
             <td>
-                <a href='#' onclick='modifierJoueur({$index})'>Modifier</a>
-                <a href='#' onclick='supprimerJoueur({$index})'>Supprimer</a>
+                <a href='#' onclick='modifierJoueur({$joueur["jou_id"]})'>Modifier</a>
+                <a href='#' onclick='supprimerJoueur({$joueur["jou_id"]})'>Supprimer</a>
             </td>
         </tr>";
     }
@@ -92,21 +102,29 @@ function afficher_liste_joueurs()
             rows.forEach(row => tbody.appendChild(row));
         }
 
-        function modifierJoueur(index) {
-            window.location.href = "/modifier-joueur?index=" + index;
+        function modifierJoueur(id) {
+            window.location.href = "/modifier-joueur?jou_id=" + id;
         }
 
-        function supprimerJoueur(index) {
+        function supprimerJoueur(id) {
+            if (isNaN(id) || id <= 0) {
+                alert("ID invalide.");
+                return;
+            }
+
             if (confirm("Voulez-vous vraiment supprimer ce joueur ?")) {
-                fetch("/wp-json/gestion-equipe/v1/supprimer-joueur/" + index, {
+                fetch(`/wp-json/gestion-equipe/v1/supprimer-joueur/${id}`, {
                     method: "DELETE"
-                }).then(response => response.json())
+                })
+                .then(response => response.json())
                 .then(data => {
                     alert(data.message);
                     location.reload();
-                }).catch(error => console.error("Erreur:", error));
+                })
+                .catch(error => console.error("Erreur:", error));
             }
-        }
+}
+
     </script>';
 
     return $html;

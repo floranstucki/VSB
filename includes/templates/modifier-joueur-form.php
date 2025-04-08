@@ -1,26 +1,32 @@
 <?php 
-if (!isset($_GET['index'])) {
+require_once dirname(__DIR__) . '/fonctions.php';
+// Récupérer l'index de joueur passé en paramètre (GET)
+$joueur_id = isset($_GET['jou_id']) ? (int) $_GET['jou_id'] : 0;
+//$file_path = plugin_dir_path(__FILE__) . 'joueur_form.json';
+
+// Vérifier si le joueur existe
+if ($joueur_id == 0) {
     echo "<p>Erreur : Aucun joueur sélectionné.</p>";
     return;
 }
 
-$index = (int) $_GET['index'];
-$file_path = dirname(__dir__,2) . '/includes/joueur_form.json';
+global $wpdb;
+$joueur = $wpdb->get_row($wpdb->prepare("
+    SELECT j.*, p.*, je.jouE_equipe_id 
+    FROM vsb_joueur j
+    JOIN vsb_personne p ON j.jou_pers_id = p.pers_id
+    LEFT JOIN vsb_joueurEquipe je ON je.jouE_joueur_id = j.jou_id
+    WHERE j.jou_id = %d
+", $joueur_id), ARRAY_A);
 
-if (!file_exists($file_path)) {
-    echo "<p>Aucun joueur enregistré.</p>";
-    return;
-}
-
-$json_data = file_get_contents($file_path);
-$joueurs = json_decode($json_data, true);
-
-if (!isset($joueurs[$index])) {
+// Vérifier si le joueur existe dans la base
+if (!$joueur) {
     echo "<p>Joueur introuvable.</p>";
     return;
 }
 
-$joueur = $joueurs[$index];
+$equipes = obtenir_equipes(); // Récupérer la liste des équipes
+
 ?>
 
 <!DOCTYPE html>
@@ -36,31 +42,30 @@ $joueur = $joueurs[$index];
         <?php wp_nonce_field('wp_rest'); ?>
 
         <!-- Champ caché pour l'index -->
-        <input type="hidden" name="index" value="<?php echo $index; ?>">
+        <input type="hidden" name="jou_id" value="<?php echo $joueur['jou_id']; ?>">
 
         <label for="name">Nom du joueur</label>
-        <input type="text" name="name" id="name" value="<?php echo $joueur['name']; ?>">
+        <input type="text" name="pers_nom" id="pers_nom" value="<?php echo $joueur['pers_nom']; ?>">
 
         <label for="firstName">Prénom du joueur</label>
-        <input type="text" name="firstName" id="firstName" value="<?php echo $joueur['firstName']; ?>">
+        <input type="text" name="pers_prenom" id="pers_prenom" value="<?php echo $joueur['pers_prenom']; ?>">
 
         <label for="dateNaissance">Date de naissance</label>
-        <input type="date" name="dateNaissance" id="dateNaissance" value="<?php echo $joueur['dateNaissance']; ?>">
+        <input type="date" name="pers_date_nai" id="pers_date_nai" value="<?php echo $joueur['pers_date_nai']; ?>">
 
         <label for="address">Adresse</label>
-        <input type="text" name="address" id="address" value="<?php echo $joueur['address']; ?>">
+        <input type="text" name="pers_adresse" id="pers_adresse" value="<?php echo $joueur['pers_adresse']; ?>">
 
         <label for="npa">NPA/Lieu</label>
-        <input type="text" name="npa" id="npa" value="<?php echo $joueur['npa']; ?>">
+        <input type="text" name="pers_NPA" id="pers_NPA" value="<?php echo $joueur['pers_NPA']; ?>">
 
         <label for="equipe">Équipe</label>
         <select name="equipe" id="equipe">
             <option value="">Sélectionnez une équipe</option>
             <?php 
-            $equipes = ["U08B", "U08A", "U10B", "U10A", "U12B", "U12A", "U14M3", "U14M2", "U14M1", "U16M2", "U16M1", "U18M2", "U18M1", "U18U20M", "2LCM", "1LNM"];
             foreach ($equipes as $equipe) {
-                $selected = ($joueur['equipe'] == $equipe) ? 'selected' : '';
-                echo "<option value='$equipe' $selected>$equipe</option>";
+                $selected = ($joueur['jouE_equipe_id'] == $equipe['equ_id']) ? 'selected' : '';
+                echo "<option value='{$equipe['equ_id']}' $selected>{$equipe['equ_cat']}</option>";
             }
             ?>
         </select>
@@ -85,7 +90,7 @@ jQuery(document).ready(function($){
             contentType: false,
             success: function(response) {
                 alert(response.message);
-                window.location.href = "/liste-des-joueurs"; 
+                window.location.href = "/liste-joueurs"; 
             },
             error: function(xhr) {
                 console.error("Erreur AJAX:", xhr.responseText);

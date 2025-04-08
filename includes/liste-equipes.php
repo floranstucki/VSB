@@ -1,6 +1,9 @@
 <?php
-
+require_once 'fonctions.php';
+//require_once './fonctions.php';
 add_shortcode('liste_equipes', 'afficher_liste_equipes');
+
+
 
 function afficher_liste_equipes() {
     $equipes_file = plugin_dir_path(__FILE__) . 'equipe_form.json';
@@ -12,8 +15,7 @@ function afficher_liste_equipes() {
     }
 
     // Charger les équipes
-    $json_equipes = file_get_contents($equipes_file);
-    $equipes = json_decode($json_equipes, true);
+    $equipes = obtenir_toutes_equipes();
 
     if (!is_array($equipes)) {
         return "<p>Erreur de lecture des équipes.</p>";
@@ -21,9 +23,7 @@ function afficher_liste_equipes() {
 
     // Charger les joueurs si le fichier existe
     $joueurs = [];
-    if (file_exists($joueurs_file)) {
-        $json_joueurs = file_get_contents($joueurs_file);
-        $joueurs_data = json_decode($json_joueurs, true);
+        $joueurs_data = obtenir_joueurs();
 
         if (is_array($joueurs_data)) {
             // Compter le nombre de joueurs par équipe
@@ -39,7 +39,7 @@ function afficher_liste_equipes() {
             }
             
         }
-    }
+    
 
     $html = "<table border='1'>";
 $html .= "<tr><th>Équipe</th><th>Nombre de joueurs</th></tr>";
