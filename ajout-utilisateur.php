@@ -4,7 +4,7 @@
  * Plugin Name: Gestion d'équipes
  * Description: Gestion des membres des équipes d'une association sportive
  * Version: 1.0
- * Author: Stucki Floran / Carl-William Ouedraogo 
+ * Author: VSB  
  */
 
  if(!defined('ABSPATH')) {
@@ -22,9 +22,8 @@
         include_once(MY_PLUGIN_PATH . 'includes/utilities.php');
         include_once(MY_PLUGIN_PATH . 'includes/option-page.php');
         include_once(MY_PLUGIN_PATH . 'includes/ajouter-joueur.php');
-        include_once(MY_PLUGIN_PATH . 'includes/pages-joueurs.php');
-        include_once(MY_PLUGIN_PATH . 'includes/pages-equipes.php');
-        include_once(MY_PLUGIN_PATH . 'includes/api.php');
+        include_once(MY_PLUGIN_PATH . 'includes/liste-joueurs.php');
+        include_once(MY_PLUGIN_PATH . 'includes/liste-equipes.php');
         include_once(MY_PLUGIN_PATH . 'includes/modifier-joueur.php');
 
     }
