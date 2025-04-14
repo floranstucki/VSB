@@ -2,25 +2,22 @@
 
 add_shortcode('liste_joueurs_1', 'afficher_liste_joueurs_1');
 require_once 'fonctions.php';
-//require_once './fonctions.php';
 
-//fonction pour afficher les joueurs 
+
+
 function afficher_liste_joueurs_1()
 {
-    // Définir le chemin du fichier JSON
-    $file_path = plugin_dir_path(__FILE__) . 'joueur_form.json';
-
-    // Vérifier si le fichier existe
-    if (!file_exists($file_path)) {
-        return "<p>Aucun joueur enregistré.</p>";
-    }
-
-    // Lire et décoder le fichier JSON
     $joueurs = obtenir_joueurs();
+
 
     if (!is_array($joueurs)) {
         return "<p>Erreur de lecture des joueurs.</p>";
     }
+
+    if (count($joueurs)) {
+        return "<p>Aucun joueur enregistré.</p>";
+    }
+ 
 
     // Vérification de l'équipe en GET (pour filtrer les joueurs)
     $equipe_filtre = isset($_GET['equipe']) ? htmlspecialchars($_GET['equipe']) : null;

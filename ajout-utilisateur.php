@@ -24,7 +24,6 @@
         include_once(MY_PLUGIN_PATH . 'includes/ajouter-joueur.php');
         include_once(MY_PLUGIN_PATH . 'includes/liste-joueurs.php');
         include_once(MY_PLUGIN_PATH . 'includes/liste-equipes.php');
-        include_once(MY_PLUGIN_PATH . 'includes/api.php');
         include_once(MY_PLUGIN_PATH . 'includes/modifier-joueur.php');
 
     }

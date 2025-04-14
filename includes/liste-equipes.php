@@ -1,21 +1,12 @@
 <?php
 require_once 'fonctions.php';
-//require_once './fonctions.php';
 add_shortcode('liste_equipes', 'afficher_liste_equipes');
 
 
 
 function afficher_liste_equipes() {
-    $equipes_file = plugin_dir_path(__FILE__) . 'equipe_form.json';
-    $joueurs_file = plugin_dir_path(__FILE__) . 'joueur_form.json';
-
-    // Vérifier l'existence des fichiers
-    if (!file_exists($equipes_file)) {
-        return "<p>Aucune équipe enregistrée.</p>";
-    }
-
     // Charger les équipes
-    $equipes = obtenir_toutes_equipes();
+    $equipes = obtenir_equipes();
 
     if (!is_array($equipes)) {
         return "<p>Erreur de lecture des équipes.</p>";
@@ -28,8 +19,8 @@ function afficher_liste_equipes() {
         if (is_array($joueurs_data)) {
             // Compter le nombre de joueurs par équipe
             foreach ($joueurs_data as $joueur) {
-                if (isset($joueur['equipe'])) {
-                    $equipe_nom = $joueur['equipe'];
+                if (isset($joueur['equ_cat'])) {
+                    $equipe_nom = $joueur['equ_cat'];
                     if (!isset($joueurs[$equipe_nom])) {
                         $joueurs[$equipe_nom] = 0;
                     }
@@ -45,8 +36,8 @@ function afficher_liste_equipes() {
 $html .= "<tr><th>Équipe</th><th>Nombre de joueurs</th></tr>";
 
 foreach ($equipes as $equipe) {
-    if (isset($equipe['name'])) {
-        $nom_equipe = $equipe['name'];
+    if (isset($equipe['equ_cat'])) {
+        $nom_equipe = $equipe['equ_cat'];
         $nb_joueurs = isset($joueurs[$nom_equipe]) ? $joueurs[$nom_equipe] : 0;
         
         // Ajouter le lien au nom de l'équipe
